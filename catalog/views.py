@@ -15,6 +15,12 @@ def index(request):
     # Available books (status = 'a')
     num_instances_available = BookInstance.objects.filter(status__exact='a').count()
 
+    #  Number of sci fi books
+    num_sci_fi = Genre.objects.filter(name__exact='Science-Fiction').count()
+
+    # Number of books that contains the word "Ellana"
+    num_books_ellana = Book.objects.filter(title__icontains='Ellana').count()
+
     # The 'all()' is implied by default
     num_authors = Author.objects.count()
 
@@ -23,6 +29,8 @@ def index(request):
         'num_instances': num_instances,
         'num_instances_available': num_instances_available,
         'num_authors': num_authors,
+        'num_sci_fi': num_sci_fi,
+        'num_books_ellana': num_books_ellana,
     }
 
     return render(request, 'index.html', context=context)
@@ -30,8 +38,19 @@ def index(request):
 
 class BookListView(generic.ListView):
     model = Book
-    context_object_name = 'My book list'
-    queryset = Book.objects.filter(title__icontains='war')[:5]  # 5 books that contains war in the title
-    template_name = 'books/some_random_template.html'
+
+    #  paginate_by = 2  # Paginate every 2
+
+    # context_object_name = 'My book list'
+    # queryset = Book.objects.filter(title__icontains='war')[:5]  # 5 books that contains war in the title
+    # template_name = 'books/some_random_template.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(BookListView, self).get_context_data(**kwargs)
+        #  You can add some data
+        # context['any_data'] = "Some piece of data"
+        return context
 
 
+class BookDetailView(generic.DetailView):
+    model = Book
