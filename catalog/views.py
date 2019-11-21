@@ -8,6 +8,10 @@ from django.views import generic
 def index(request):
     """ View function for home page of site. """
 
+    #  Number of visits
+    num_visits = request.session.get('num_visits', 0) + 1
+    request.session['num_visits'] = num_visits
+
     # Generate counts of some of the main objects
     num_books = Book.objects.all().count()
     num_instances = BookInstance.objects.all().count()
@@ -31,6 +35,7 @@ def index(request):
         'num_authors': num_authors,
         'num_sci_fi': num_sci_fi,
         'num_books_ellana': num_books_ellana,
+        'num_visits': num_visits,
     }
 
     return render(request, 'index.html', context=context)
