@@ -1,4 +1,9 @@
-from django.shortcuts import render
+import datetime
+
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
+
+from catalog.forms import RenewBookForm
 from catalog.models import *
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -85,3 +90,33 @@ class LoanedBooksLibrarianListView(PermissionRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         return BookInstance.objects.filter(status__exact='o').order_by('due_back')
+
+
+def renew_book_librarian(request, pk):
+    book_instance = get_object_or_404(BookInstance, pk=pk)
+
+    # If it is a post request we proceed
+    if request.method == "POST":
+
+        # Create a form instance that we populate with data
+        form = RenewBookForm(request.POST)
+
+        # Check form validity
+        if form.is_valid():
+            # We process the data
+            book_instance.due_back = form.cleaned_data['renewal_date']
+            book_instance.save()
+
+            # Redirect to a new URL
+            return HttpResponseRedirect(reverse('all-borrowed'))
+
+    else:
+        proposed_renewal_date = datetime.date.today() + datetime.timedelta(weeks=3)
+        form = RenewBookForm(initial={'renewal_date': proposed_renewal_date})
+
+    context = {
+        'form': form,
+        'book_instance': book_instance,
+    }
+
+    return render(request, 'catalog/book_renew_librarian.html', context)
