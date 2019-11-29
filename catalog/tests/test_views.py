@@ -256,3 +256,60 @@ class RenewBookInstancesViewTest(TestCase):
 
         # Check we used correct template
         self.assertTemplateUsed(response, 'catalog/book_renew_librarian.html')
+
+
+class LoanedBookInstanceByUserListViewTest(TestCase):
+    def setUp(self) -> None:
+        test_user1 = User.objects.create_user(username='testuser1', password='1X<ISRUkw+tuK')
+        test_user2 = User.objects.create_user(username='testuser2', password='2HJ1vRV0Z&3iD')
+
+        test_user1.save()
+        test_user2.save()
+
+        test_author = Author.objects.create(first_name='John', last_name='Doe')
+        test_genre  = Genre.objects.create(name='Fantasy')
+        test_language = Language.objects.create(name='English')
+        test_book = Book.objects.create(
+            title='Book Title',
+            summary='My book summary',
+            isbn = 'ABCDEFG',
+            author=test_author,
+        )
+
+        genre_objects_for_book = Genre.objects.all()
+        test_book.genre.set(genre_objects_for_book)
+        test_book.save()
+
+        number_of_book_copies = 30
+        for book_copy in range(number_of_book_copies):
+            return_date = timezone.localtime()
+            the_borrower = test_user1 if book_copy % 2 else test_user2
+            status = 'm'
+            BookInstance.objects.create(
+                book=test_book,
+                imprint='Unlikely Imprint, 2016',
+                due_back=return_date,
+                borrower=the_borrower,
+                status=status,
+            )
+
+    def test_redirect_if_not_logged_in(self):
+        response = self.client.get(reverse('my-borrowed'))
+        self.assertRedirects(response, '/accounts/login/?next='+reverse('my-borrowed'))
+
+    def test_logged_in_uses_correct_template(self):
+        login = self.client.login(username='testuser1', password='1X<ISRUkw+tuK')
+        response = self.client.get(reverse('my-borrowed'))
+
+        # Check our user is logged in
+        self.assertEqual(str(response.context['user']), 'testuser1')
+        # And that we go a success
+        self.assertEqual(response.status_code, 200)
+
+        # Assert we used the correct template
+        self.assertTemplateUsed(response, 'catalog/bookinstance_list_borrowed_user.html')
+
+    def test_only_borrowed_books_in_list(self):
+        login = self.client.login(username='testuser1', password='1X<ISRUkw+tuK')
+        response = self.client.get()
+
