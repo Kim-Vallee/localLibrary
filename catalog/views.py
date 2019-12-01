@@ -128,32 +128,38 @@ def renew_book_librarian(request, pk):
     return render(request, 'catalog/book_renew_librarian.html', context)
 
 
-class AuthorCreate(CreateView):
+class AuthorCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Author
     fields = '__all__'
     initial = {'first_name': 'albertu'}
+    permission_required = 'catalog.can_mark_returned'
 
 
-class AuthorUpdate(UpdateView):
+class AuthorUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Author
     fields = ['first_name', 'last_name', 'date_of_birth', 'date_of_death']
+    permission_required = 'catalog.can_mark_returned'
 
 
-class AuthorDelete(DeleteView):
+class AuthorDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Author
     success_url = reverse_lazy('authors')
+    permission_required = 'catalog.can_mark_returned'
 
 
-class BookCreate(CreateView):
+class BookCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Book
     fields = '__all__'
+    permission_required = 'catalog.can_mark_returned'
 
 
-class BookUpdate(UpdateView):
+class BookUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Book
     fields = '__all__'
+    permission_required = 'catalog.can_mark_returned'
 
 
-class BookDelete(DeleteView):
+class BookDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Book
     success_url = reverse_lazy('books')
+    permission_required = 'catalog.can_mark_returned'
