@@ -1,3 +1,4 @@
+# Editor files
 .idea/
 
 # Database
@@ -9,4 +10,8 @@
 # Virtual environnement
 venv/
 
+# Pycache
 */__pycache__/
+
+# virtual environnement
+.env
