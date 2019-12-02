@@ -1,4 +1,12 @@
 .idea/
-db.sqlite3
+
+# Database
+*.sqlite3
+
+# Backup files
+*.bak
+
+# Virtual environnement
 venv/
+
 */__pycache__/
