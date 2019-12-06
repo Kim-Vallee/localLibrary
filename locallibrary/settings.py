@@ -33,7 +33,7 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 X_FRAME_OPTIONS = 'DENY'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['sleepy-mountain-45994.herokuapp.com']
 
 # Application definition
 
